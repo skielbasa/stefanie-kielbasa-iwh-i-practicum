@@ -15,13 +15,32 @@ const PRIVATE_APP_ACCESS = process.env.TOKEN;
 
 // * Code for Route 1 goes here
 
+app.get('/', async (req, res) => {
+
+  const objects = 'https://api.hubspot.com/crm/v3/objects/cards?limit=10&properties=name&properties=card_name&properties=cmc&properties=spell_type&archived=false';
+  const headers = {
+      Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
+      'Content-Type': 'application/json'
+  }
+
+  try {
+      const resp = await axios.get(objects, { headers });
+      const data = resp.data.results;
+
+      res.render('homepage', { title: 'MTG Cards | Integrating With HubSpot I Practicum', data });
+  } catch (error) {
+      console.error(error);
+  }
+
+});
+
 // TODO: ROUTE 2 - Create a new app.get route for the form to create or update new custom object data. Send this data along in the next route.
 
 // * Code for Route 2 goes here
 
 app.get('/update-cobj', async (req, res) => {
 
-  const objects = 'https://api.hubspot.com/crm/v3/objects/contacts';
+  const objects = 'https://api.hubspot.com/crm/v3/objects/cards';
   const headers = {
       Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
       'Content-Type': 'application/json'
@@ -60,7 +79,8 @@ app.post('/update-cobj', async (req, res) => {
 
     try { 
         await axios.post(addCard, update, { headers } );
-        res.location("/")
+        res.redirect('back');
+
     } catch(err) {
         console.error(err);
     }
